@@ -5,47 +5,62 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clasificador de imágenes</title>
-    <style>
-        #speech-container {
-            display: none;
-        }
-    </style>
 </head>
 <body>
-    <h2>Carga una imagen para clasificar</h2>
-    <form action="/" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" accept="image/*">
-        <input type="submit" value="Clasificar imagen">
-    </form>
-    
-    {% if prediction %}
-        <h2>Resultado de la clasificación:</h2>
-        <p>{{ prediction }}</p>
-    {% endif %}
-    
-    <div id="speech-container">
-        <!-- El discurso se cargará aquí -->
-    </div>
 
-    <script>
-        function loadSpeech(speechUrl) {
-            if (speechUrl) {
-                fetch(speechUrl)
-                    .then(response => response.text())
-                    .then(data => {
-                        document.getElementById('speech-container').innerHTML = data;
-                        document.getElementById('speech-container').style.display = 'block';
-                    })
-                    .catch(error => console.error('Error al cargar el discurso:', error));
-            }
-        }
-        
-        window.onload = function() {
-            var speechUrl = "{{ speech_url }}";
-            if (speechUrl) {
-                loadSpeech(speechUrl);
-            }
-        };
-    </script>
+<h2>Carga una imagen para clasificar</h2>
+
+<form id="form" action="/" method="post" enctype="multipart/form-data">
+    <input id="file-input" type="file" name="file" accept="image/*">
+    <input type="submit" value="Clasificar imagen">
+</form>
+
+{% if prediction %}
+<h2>Resultado de la clasificación:</h2>
+<p>{{ prediction }}</p>
+{% endif %}
+
+<div id="speech-container" style="display: none;">
+  <!-- El discurso se cargará aquí -->
+</div>
+
+<script>
+  document.getElementById('form').addEventListener('submit', function(event) {
+    var fileInput = document.getElementById('file-input');
+    if (fileInput.files.length === 0) {
+      alert('Por favor, selecciona un archivo antes de enviar.');
+      event.preventDefault();
+    }
+  });
+
+  function loadSpeech(plato) {
+    var speeches = {
+      'lomo_saltado': 'https://raw.githubusercontent.com/checkifood/direccionURL/main/lomo_saltado_consecuencias.html',
+      'bisteck_pobre': 'https://raw.githubusercontent.com/checkifood/direccionURL/main/bistec_pobreconsecuencias.html',
+      'ensalada': 'https://raw.githubusercontent.com/checkifood/direccionURL/main/ensalada_consecuencias.html',
+      'pollo_brasa': 'https://raw.githubusercontent.com/checkifood/direccionURL/main/pollo_brasaconsecuencias.html',
+      'arroz_chaufa': 'https://raw.githubusercontent.com/checkifood/direccionURL/main/arroz_chaufaconsecuencias.html',
+    };
+
+    var speechUrl = speeches[plato];
+    if (speechUrl) {
+      fetch(speechUrl)
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById('speech-container').innerHTML = data;
+          document.getElementById('speech-container').style.display = 'block';
+        })
+        .catch(error => console.error('Error al cargar el discurso:', error));
+    }
+  }
+
+  window.onload = function() {
+    var plato = "{{ prediction }}".toLowerCase().replace(' ', '_');
+    if (plato) {
+      loadSpeech(plato);
+    }
+  };
+</script>
+
 </body>
 </html>
