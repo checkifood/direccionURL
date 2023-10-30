@@ -5,20 +5,47 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clasificador de imágenes</title>
+    <style>
+        #speech-container {
+            display: none;
+        }
+    </style>
 </head>
 <body>
+    <h2>Carga una imagen para clasificar</h2>
+    <form action="/" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*">
+        <input type="submit" value="Clasificar imagen">
+    </form>
+    
+    {% if prediction %}
+        <h2>Resultado de la clasificación:</h2>
+        <p>{{ prediction }}</p>
+    {% endif %}
+    
+    <div id="speech-container">
+        <!-- El discurso se cargará aquí -->
+    </div>
 
-<h2>Carga una imagen para clasificar</h2>
-
-<form action="/" method="post" enctype="multipart/form-data">
-    <input type="file" name="file" accept="image/*">
-    <input type="submit" value="Clasificar imagen">
-</form>
-
-{% if prediction %}
-<h2>Resultado de la clasificación:</h2>
-<p>{{ prediction }}</p>
-{% endif %}
-
+    <script>
+        function loadSpeech(speechUrl) {
+            if (speechUrl) {
+                fetch(speechUrl)
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById('speech-container').innerHTML = data;
+                        document.getElementById('speech-container').style.display = 'block';
+                    })
+                    .catch(error => console.error('Error al cargar el discurso:', error));
+            }
+        }
+        
+        window.onload = function() {
+            var speechUrl = "{{ speech_url }}";
+            if (speechUrl) {
+                loadSpeech(speechUrl);
+            }
+        };
+    </script>
 </body>
 </html>
